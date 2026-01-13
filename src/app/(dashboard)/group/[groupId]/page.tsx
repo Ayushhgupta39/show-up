@@ -7,6 +7,8 @@ import { TaskCard } from "@/components/tasks/task-card"
 import { CreateGoalDialog } from "@/components/goals/create-goal-dialog"
 import { ShortTermGoalCard } from "@/components/goals/short-term-goal-card"
 import { LongTermGoalCard } from "@/components/goals/long-term-goal-card"
+import { JoinRequestsList } from "@/components/groups/join-requests-list"
+import { InviteLinkManager } from "@/components/groups/invite-link-manager"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -116,54 +118,32 @@ export default async function GroupPage({
   return (
     <div className="p-8">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{group.name}</h1>
             {group.description && (
               <p className="mt-2 text-muted-foreground">{group.description}</p>
             )}
-            <p className="mt-1 text-sm text-muted-foreground">
-              Owner: {group.owner.name || group.owner.email}
-            </p>
+            <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <Users className="h-3.5 w-3.5" />
+                <span>{totalMembers} members</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Target className="h-3.5 w-3.5" />
+                <span>{totalTasks} total tasks</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Flame className="h-3.5 w-3.5 text-orange-500" />
+                <span>{completedTasks} completed</span>
+              </div>
+            </div>
           </div>
           {membership.role === "admin" && (
             <Badge variant="secondary">Admin</Badge>
           )}
         </div>
-      </div>
-
-      {/* Stats */}
-      <div className="mb-8 flex items-center gap-2 md:grid md:gap-4 md:grid-cols-3">
-        <Card className="w-full">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Members</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalMembers}</div>
-          </CardContent>
-        </Card>
-        <Card className="w-full">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalTasks}</div>
-          </CardContent>
-        </Card>
-        <Card className="w-full">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Completed Tasks
-            </CardTitle>
-            <Flame className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{completedTasks}</div>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-3">
@@ -250,6 +230,16 @@ export default async function GroupPage({
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Invite Link (Admin Only) */}
+          {membership.role === "admin" && (
+            <InviteLinkManager groupId={groupId} initialInviteToken={group.inviteToken} />
+          )}
+
+          {/* Join Requests (Admin Only) */}
+          {membership.role === "admin" && (
+            <JoinRequestsList groupId={groupId} />
+          )}
+
           {/* Members */}
           <Card>
             <CardHeader>

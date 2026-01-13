@@ -100,7 +100,7 @@ export async function PATCH(
 
     if (!validatedFields.success) {
       return NextResponse.json(
-        { error: "Invalid fields", details: validatedFields.error.errors },
+        { error: "Invalid fields", details: validatedFields.error.issues},
         { status: 400 }
       )
     }

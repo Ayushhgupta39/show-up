@@ -35,6 +35,7 @@ model Group {
   name        String
   description String?
   ownerId     String   @db.ObjectId
+  inviteToken String?  @unique // Unique token for invite links
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

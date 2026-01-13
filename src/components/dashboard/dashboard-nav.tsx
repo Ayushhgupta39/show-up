@@ -54,6 +54,16 @@ export function DashboardNav({ user }: DashboardNavProps) {
             >
               Dashboard
             </Link>
+            <Link
+              href="/browse-groups"
+              className={`transition-colors hover:text-foreground/80 ${
+                pathname === "/browse-groups"
+                  ? "text-foreground"
+                  : "text-foreground/60"
+              }`}
+            >
+              Browse Groups
+            </Link>
           </nav>
         </div>
         <div className="ml-auto flex items-center space-x-4">

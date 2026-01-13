@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,6 +12,9 @@ import { toast } from "sonner"
 
 export default function SignupPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
+
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -44,7 +47,10 @@ export default function SignupPage() {
       }
 
       toast.success("Account created successfully! Please log in.")
-      router.push("/login")
+      const loginUrl = callbackUrl !== "/dashboard"
+        ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}`
+        : "/login"
+      router.push(loginUrl)
     } catch (error) {
       toast.error("Something went wrong. Please try again.")
       console.error(error)
@@ -120,7 +126,10 @@ export default function SignupPage() {
             </Button>
             <p className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link href="/login" className="text-primary hover:underline">
+              <Link
+                href={callbackUrl !== "/dashboard" ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/login"}
+                className="text-primary hover:underline"
+              >
                 Log in
               </Link>
             </p>

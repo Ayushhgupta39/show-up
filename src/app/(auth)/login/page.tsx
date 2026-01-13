@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
@@ -12,6 +12,9 @@ import { toast } from "sonner"
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
+
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
@@ -35,7 +38,7 @@ export default function LoginPage() {
       }
 
       toast.success("Logged in successfully!")
-      router.push("/dashboard")
+      router.push(callbackUrl)
       router.refresh()
     } catch (error) {
       toast.error("Something went wrong. Please try again.")
@@ -67,7 +70,7 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 mb-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
@@ -84,8 +87,11 @@ export default function LoginPage() {
               {isLoading ? "Logging in..." : "Log in"}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              Don't have an account?{" "}
-              <Link href="/signup" className="text-primary hover:underline">
+              Don&apos;t have an account?{" "}
+              <Link
+                href={callbackUrl !== "/dashboard" ? `/signup?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/signup"}
+                className="text-primary hover:underline"
+              >
                 Sign up
               </Link>
             </p>
