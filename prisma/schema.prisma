@@ -1,0 +1,165 @@
+// Prisma schema for ShowUP accountability platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+model User {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  email    String   @unique
+  password String   // bcrypt hashed
+  name     String?
+  timezone String   @default("UTC") // Browser-detected timezone
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  groupMemberships GroupMember[]
+  ownedGroups      Group[]       @relation("GroupOwner")
+  joinRequests     JoinRequest[]
+  tasks            DailyTask[]
+  goals            Goal[]
+  streaks          Streak[]
+
+  @@map("users")
+}
+
+model Group {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  ownerId     String   @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  owner        User          @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members      GroupMember[]
+  joinRequests JoinRequest[]
+  tasks        DailyTask[]
+  goals        Goal[]
+  streaks      Streak[]
+
+  @@index([ownerId])
+  @@map("groups")
+}
+
+model GroupMember {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  groupId  String   @db.ObjectId
+  userId   String   @db.ObjectId
+  role     String   @default("member") // "admin" or "member"
+  joinedAt DateTime @default(now())
+
+  // Relations
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
+  @@index([groupId])
+  @@map("group_members")
+}
+
+model JoinRequest {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  groupId String   @db.ObjectId
+  userId  String   @db.ObjectId
+  status  String   @default("pending") // "pending", "approved", "rejected"
+  message String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
+  @@index([groupId, status])
+  @@map("join_requests")
+}
+
+model DailyTask {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  groupId     String    @db.ObjectId
+  userId      String    @db.ObjectId
+  title       String
+  description String?
+  date        DateTime  // Date in user's timezone (stored as UTC start of day)
+  status      String    @default("pending") // "pending", "completed", "missed"
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // CRITICAL: Enforce one task per user per group per day
+  @@unique([groupId, userId, date])
+  @@index([userId, date])
+  @@index([groupId, date])
+  @@index([status])
+  @@map("daily_tasks")
+}
+
+model Goal {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  groupId     String   @db.ObjectId
+  userId      String   @db.ObjectId
+  type        String   // "short_term" or "long_term"
+  title       String
+  description String?
+
+  // For short-term goals (checklist)
+  items Json? // Array of {id: string, text: string, completed: boolean}
+
+  // For long-term goals (calendar)
+  startDate  DateTime?
+  endDate    DateTime?
+  milestones Json? // Array of {date: DateTime, text: string, completed: boolean}
+
+  status String @default("active") // "active", "completed", "abandoned"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([groupId])
+  @@index([type, status])
+  @@map("goals")
+}
+
+model Streak {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  groupId       String    @db.ObjectId
+  userId        String    @db.ObjectId
+  currentStreak Int       @default(0)
+  bestStreak    Int       @default(0)
+  lastTaskDate  DateTime? // Last date a task was completed
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
+  @@index([groupId])
+  @@map("streaks")
+}
