@@ -43,7 +43,22 @@ export default async function DashboardPage() {
     },
   })
 
-  const groups = groupMemberships.map((membership) => ({
+  // Filter out memberships where group was deleted (data cleanup)
+  const validMemberships = groupMemberships.filter((membership) => membership.group !== null)
+
+  // Clean up orphaned memberships
+  const orphanedMemberships = groupMemberships.filter((membership) => membership.group === null)
+  if (orphanedMemberships.length > 0) {
+    await prisma.groupMember.deleteMany({
+      where: {
+        id: {
+          in: orphanedMemberships.map((m) => m.id),
+        },
+      },
+    })
+  }
+
+  const groups = validMemberships.map((membership) => ({
     ...membership.group,
     role: membership.role,
   }))
