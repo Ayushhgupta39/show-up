@@ -60,22 +60,23 @@ export function CreateGroupDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Group
+        <Button className="text-sm md:text-base shrink-0">
+          <Plus className="mr-1 md:mr-2 h-4 w-4" />
+          <span className="hidden sm:inline">Create Group</span>
+          <span className="sm:hidden">Create</span>
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-[95vw] sm:max-w-md">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Create a new group</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-lg md:text-xl">Create a new group</DialogTitle>
+            <DialogDescription className="text-sm md:text-base">
               Create an accountability group and invite others to join
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-3 md:space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Group Name</Label>
+              <Label htmlFor="name" className="text-sm md:text-base">Group Name</Label>
               <Input
                 id="name"
                 placeholder="e.g., Morning Writers"
@@ -83,11 +84,12 @@ export function CreateGroupDialog() {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
+                className="text-sm md:text-base"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Description (Optional)</Label>
+              <Label htmlFor="description" className="text-sm md:text-base">Description (Optional)</Label>
               <Textarea
                 id="description"
                 placeholder="What is this group about?"
@@ -95,12 +97,13 @@ export function CreateGroupDialog() {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
+                className="text-sm md:text-base"
                 rows={3}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading} className="w-full sm:w-auto text-sm md:text-base">
               {isLoading ? "Creating..." : "Create Group"}
             </Button>
           </DialogFooter>

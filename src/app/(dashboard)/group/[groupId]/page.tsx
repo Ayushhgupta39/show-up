@@ -116,90 +116,92 @@ export default async function GroupPage({
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-6 lg:p-8">
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">{group.name}</h1>
+      <div className="mb-4 md:mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight truncate">{group.name}</h1>
             {group.description && (
-              <p className="mt-2 text-muted-foreground">{group.description}</p>
+              <p className="mt-1 md:mt-2 text-sm md:text-base text-muted-foreground line-clamp-2">{group.description}</p>
             )}
-            <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="mt-2 md:mt-3 flex flex-wrap items-center gap-2 md:gap-4 text-xs md:text-sm text-muted-foreground">
               <div className="flex items-center gap-1.5">
-                <Users className="h-3.5 w-3.5" />
+                <Users className="h-3 w-3 md:h-3.5 md:w-3.5" />
                 <span>{totalMembers} members</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Target className="h-3.5 w-3.5" />
-                <span>{totalTasks} total tasks</span>
+                <Target className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                <span>{totalTasks} tasks</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Flame className="h-3.5 w-3.5 text-orange-500" />
-                <span>{completedTasks} completed</span>
+                <Flame className="h-3 w-3 md:h-3.5 md:w-3.5 text-orange-500" />
+                <span>{completedTasks} done</span>
               </div>
             </div>
           </div>
           {membership.role === "admin" && (
-            <Badge variant="secondary">Admin</Badge>
+            <Badge variant="secondary" className="shrink-0">Admin</Badge>
           )}
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
         {/* Main Content - Tasks */}
-        <div className="lg:col-span-2">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold tracking-tight">Daily Tasks</h2>
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight">Daily Tasks</h2>
             <CreateTaskDialog groupId={groupId} />
           </div>
 
-          {tasks.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <p className="mb-4 text-center text-muted-foreground">
-                  No tasks yet. Be the first to add one!
-                </p>
-                <CreateTaskDialog groupId={groupId} />
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {tasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={{
-                    ...task,
-                    date: new Date(task.date),
-                    completedAt: task.completedAt ? new Date(task.completedAt) : null,
-                  }}
-                  currentUserId={session.user.id}
-                  timezone={session.user.timezone}
-                />
-              ))}
-            </div>
-          )}
+          <div>
+            {tasks.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-8 md:py-12">
+                  <p className="mb-4 text-center text-sm md:text-base text-muted-foreground">
+                    No tasks yet. Be the first to add one!
+                  </p>
+                  <CreateTaskDialog groupId={groupId} />
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3 md:space-y-4">
+                {tasks.map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={{
+                      ...task,
+                      date: new Date(task.date),
+                      completedAt: task.completedAt ? new Date(task.completedAt) : null,
+                    }}
+                    currentUserId={session.user.id}
+                    timezone={session.user.timezone}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Goals Section */}
-          <Separator className="my-8" />
+          <Separator className="my-6 md:my-8" />
 
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold tracking-tight">Goals</h2>
+          <div className="space-y-4 md:space-y-6">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-xl md:text-2xl font-bold tracking-tight">Goals</h2>
               <CreateGoalDialog groupId={groupId} />
             </div>
 
             {goals.length === 0 ? (
               <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <p className="mb-4 text-center text-muted-foreground">
+                <CardContent className="flex flex-col items-center justify-center py-8 md:py-12">
+                  <p className="mb-4 text-center text-sm md:text-base text-muted-foreground">
                     No goals yet. Set a goal to track progress!
                   </p>
                   <CreateGoalDialog groupId={groupId} />
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 md:space-y-4">
                 {goals.map((goal) => (
                   goal.type === "short_term" ? (
                     <ShortTermGoalCard
@@ -229,7 +231,7 @@ export default async function GroupPage({
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           {/* Invite Link (Admin Only) */}
           {membership.role === "admin" && (
             <InviteLinkManager groupId={groupId} initialInviteToken={group.inviteToken} />

@@ -66,10 +66,10 @@ export default function BrowseGroupsPage() {
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Browse Groups</h1>
-        <p className="text-muted-foreground">
+    <div className="p-4 md:p-6 lg:p-8">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Browse Groups</h1>
+        <p className="text-sm md:text-base text-muted-foreground mt-1">
           Discover and join accountability groups
         </p>
       </div>
@@ -78,22 +78,22 @@ export default function BrowseGroupsPage() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search groups by name or description..."
+            placeholder="Search groups..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-sm md:text-base"
           />
         </div>
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Loading groups...</p>
+        <div className="text-center py-8 md:py-12">
+          <p className="text-sm md:text-base text-muted-foreground">Loading groups...</p>
         </div>
       ) : groups.length === 0 ? (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <p className="text-center text-muted-foreground">
+          <CardContent className="flex flex-col items-center justify-center py-8 md:py-12">
+            <p className="text-center text-sm md:text-base text-muted-foreground">
               {search
                 ? "No groups found matching your search"
                 : "No groups available to join at the moment"}
@@ -101,7 +101,7 @@ export default function BrowseGroupsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 md:gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {groups.map((group) => (
             <Card key={group.id} className="flex flex-col">
               <CardHeader>

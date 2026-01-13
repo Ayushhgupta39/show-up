@@ -37,16 +37,16 @@ export function DashboardNav({ user }: DashboardNavProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 p-4 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-16 items-center">
-        <div className="mr-4 flex">
-          <Link href="/dashboard" className="mr-6 flex items-center space-x-2">
-            <span className="text-xl font-bold">Show-up</span>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-14 items-center px-4">
+        <div className="flex items-center flex-1 min-w-0">
+          <Link href="/dashboard" className="flex items-center space-x-2 mr-4 md:mr-6 shrink-0">
+            <span className="text-lg md:text-xl font-bold">Show-up</span>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
+          <nav className="flex items-center space-x-3 md:space-x-6 text-xs md:text-sm font-medium overflow-x-auto">
             <Link
               href="/dashboard"
-              className={`transition-colors hover:text-foreground/80 ${
+              className={`transition-colors hover:text-foreground/80 whitespace-nowrap ${
                 pathname === "/dashboard"
                   ? "text-foreground"
                   : "text-foreground/60"
@@ -56,7 +56,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
             </Link>
             <Link
               href="/browse-groups"
-              className={`transition-colors hover:text-foreground/80 ${
+              className={`transition-colors hover:text-foreground/80 whitespace-nowrap ${
                 pathname === "/browse-groups"
                   ? "text-foreground"
                   : "text-foreground/60"
@@ -66,7 +66,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
             </Link>
           </nav>
         </div>
-        <div className="ml-auto flex items-center space-x-4">
+        <div className="ml-2 md:ml-4 flex items-center shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
