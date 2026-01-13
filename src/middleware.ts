@@ -1,4 +1,7 @@
-import { auth } from "@/lib/auth/auth"
+import NextAuth from "next-auth"
+import { authConfig } from "@/lib/auth/auth.config"
+
+const { auth } = NextAuth(authConfig)
 
 export default auth((req) => {
   // Middleware logic handled by authConfig.callbacks.authorized

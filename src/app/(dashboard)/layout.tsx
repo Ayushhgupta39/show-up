@@ -16,7 +16,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardNav user={session.user} />
-      <main className="flex-1">{children}</main>
+      <main className="">{children}</main>
     </div>
   )
 }

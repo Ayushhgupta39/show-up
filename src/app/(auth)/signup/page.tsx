@@ -59,7 +59,7 @@ export default function SignupPage() {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
           <CardDescription>
-            Enter your information to create your ShowUP account
+            Enter your information to create your Show-up account
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>

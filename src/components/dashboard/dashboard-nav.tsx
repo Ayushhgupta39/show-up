@@ -37,11 +37,11 @@ export function DashboardNav({ user }: DashboardNavProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
+    <header className="sticky top-0 z-50 p-4 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="flex h-16 items-center">
         <div className="mr-4 flex">
           <Link href="/dashboard" className="mr-6 flex items-center space-x-2">
-            <span className="text-xl font-bold">ShowUP</span>
+            <span className="text-xl font-bold">Show-up</span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
             <Link

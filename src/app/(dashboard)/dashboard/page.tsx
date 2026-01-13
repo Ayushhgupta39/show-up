@@ -77,7 +77,7 @@ export default async function DashboardPage() {
   )
 
   return (
-    <div className="container py-8">
+    <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -138,7 +138,7 @@ export default async function DashboardPage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <p className="mb-4 text-center text-muted-foreground">
-                You're not part of any groups yet
+                You&apos;re not part of any groups yet
               </p>
               <CreateGroupDialog />
             </CardContent>

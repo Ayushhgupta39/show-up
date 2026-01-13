@@ -7,7 +7,7 @@ export default function Home() {
       <main className="flex max-w-3xl flex-col items-center justify-center space-y-8 text-center">
         <div className="space-y-4">
           <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
-            ShowUP
+            Show-Up
           </h1>
           <p className="text-xl text-muted-foreground sm:text-2xl">
             Form groups. Commit daily. Stay accountable.
@@ -16,11 +16,11 @@ export default function Home() {
 
         <div className="max-w-lg space-y-4 text-muted-foreground">
           <p>
-            ShowUP is an accountability platform where you form groups with others
+            Show-up is an accountability platform where you form groups with others
             and publicly commit to daily tasks.
           </p>
           <p className="font-semibold">
-            If you don't show up, everyone sees it.
+            If you don&apos;t show up, everyone sees it.
           </p>
         </div>
 

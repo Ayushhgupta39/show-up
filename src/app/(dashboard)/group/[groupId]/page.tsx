@@ -114,7 +114,7 @@ export default async function GroupPage({
   }
 
   return (
-    <div className="container py-8">
+    <div className="p-8">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-start justify-between">
@@ -134,8 +134,8 @@ export default async function GroupPage({
       </div>
 
       {/* Stats */}
-      <div className="mb-8 grid gap-4 md:grid-cols-3">
-        <Card>
+      <div className="mb-8 flex items-center gap-2 md:grid md:gap-4 md:grid-cols-3">
+        <Card className="w-full">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Members</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -144,7 +144,7 @@ export default async function GroupPage({
             <div className="text-2xl font-bold">{totalMembers}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="w-full">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
@@ -153,7 +153,7 @@ export default async function GroupPage({
             <div className="text-2xl font-bold">{totalTasks}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="w-full">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Completed Tasks

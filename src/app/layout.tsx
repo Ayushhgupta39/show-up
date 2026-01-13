@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ShowUP - Accountability Platform",
+  title: "Show Up - Accountability Platform",
   description: "Form groups, commit to daily tasks, and stay accountable",
 };
 
