@@ -18,50 +18,65 @@ export default async function DashboardPage() {
     redirect("/login")
   }
 
-  // Get user's groups
+  // Get user's group memberships (without include to avoid null errors)
   const groupMemberships = await prisma.groupMember.findMany({
     where: {
       userId: session.user.id,
     },
+  })
+
+  // Get the actual groups separately
+  const groupIds = groupMemberships.map((m) => m.groupId)
+  const groupsData = await prisma.group.findMany({
+    where: {
+      id: {
+        in: groupIds,
+      },
+    },
     include: {
-      group: {
-        include: {
-          owner: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-          _count: {
-            select: {
-              members: true,
-            },
-          },
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+      _count: {
+        select: {
+          members: true,
         },
       },
     },
   })
 
-  // Filter out memberships where group was deleted (data cleanup)
-  const validMemberships = groupMemberships.filter((membership) => membership.group !== null)
+  // Map groups with their roles
+  const groupsMap = new Map(groupsData.map((g) => [g.id, g]))
+  const groups = groupMemberships
+    .map((membership) => {
+      const group = groupsMap.get(membership.groupId)
+      if (!group) return null
+      return {
+        ...group,
+        role: membership.role,
+      }
+    })
+    .filter((g) => g !== null)
 
-  // Clean up orphaned memberships
-  const orphanedMemberships = groupMemberships.filter((membership) => membership.group === null)
-  if (orphanedMemberships.length > 0) {
+  // Clean up any orphaned memberships found
+  const validGroupIds = new Set(groupsData.map((g) => g.id))
+  const orphanedMembershipIds = groupMemberships
+    .filter((m) => !validGroupIds.has(m.groupId))
+    .map((m) => m.id)
+
+  if (orphanedMembershipIds.length > 0) {
     await prisma.groupMember.deleteMany({
       where: {
         id: {
-          in: orphanedMemberships.map((m) => m.id),
+          in: orphanedMembershipIds,
         },
       },
     })
   }
-
-  const groups = validMemberships.map((membership) => ({
-    ...membership.group,
-    role: membership.role,
-  }))
 
   // Get all streaks for user
   const streaks = await getAllStreaksForUser(session.user.id)
