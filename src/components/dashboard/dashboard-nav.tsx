@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { signOut } from "next-auth/react"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,36 +11,41 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { LogOut, User } from "lucide-react"
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { LogOut, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
 interface DashboardNavProps {
   user: {
-    id: string
-    email: string
-    name?: string | null
-  }
+    id: string;
+    email: string;
+    name?: string | null;
+  };
 }
 
 export function DashboardNav({ user }: DashboardNavProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
+  const { setTheme } = useTheme();
 
   const getInitials = (name?: string | null) => {
-    if (!name) return user.email.charAt(0).toUpperCase()
+    if (!name) return user.email.charAt(0).toUpperCase();
     return name
       .split(" ")
       .map((n) => n[0])
       .join("")
       .toUpperCase()
-      .slice(0, 2)
-  }
+      .slice(0, 2);
+  };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="flex h-14 items-center px-4">
         <div className="flex items-center flex-1 min-w-0">
-          <Link href="/dashboard" className="flex items-center space-x-2 mr-4 md:mr-6 shrink-0">
+          <Link
+            href="/dashboard"
+            className="flex items-center space-x-2 mr-4 md:mr-6 shrink-0"
+          >
             <span className="text-lg md:text-xl font-bold">Show-up</span>
           </Link>
           <nav className="flex items-center space-x-3 md:space-x-6 text-xs md:text-sm font-medium overflow-x-auto">
@@ -66,7 +71,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
             </Link>
           </nav>
         </div>
-        <div className="ml-2 md:ml-4 flex items-center shrink-0">
+        <div className="ml-2 md:ml-4 flex gap-2 items-center shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
@@ -78,7 +83,9 @@ export function DashboardNav({ user }: DashboardNavProps) {
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user.name}</p>
+                  <p className="text-sm font-medium leading-none">
+                    {user.name}
+                  </p>
                   <p className="text-xs leading-none text-muted-foreground">
                     {user.email}
                   </p>
@@ -91,8 +98,28 @@ export function DashboardNav({ user }: DashboardNavProps) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+                <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                <span className="sr-only">Toggle theme</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setTheme("light")}>
+                Light
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
+                Dark
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("system")}>
+                System
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
-  )
+  );
 }
