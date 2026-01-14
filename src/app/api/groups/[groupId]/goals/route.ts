@@ -99,7 +99,7 @@ export async function POST(
       )
     }
 
-    const { title, description, type, items, targetDate, startDate, endDate, milestones } =
+    const { title, description, type, items, startDate, endDate, milestones } =
       validatedFields.data
 
     // Create goal
@@ -111,7 +111,6 @@ export async function POST(
         description,
         type,
         items: items ? items : undefined,
-        targetDate: targetDate ? new Date(targetDate) : undefined,
         startDate: startDate ? new Date(startDate) : undefined,
         endDate: endDate ? new Date(endDate) : undefined,
         milestones: milestones ? milestones : undefined,
