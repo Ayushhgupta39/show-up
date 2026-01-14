@@ -123,7 +123,8 @@ model Goal {
   description String?
 
   // For short-term goals (checklist)
-  items Json? // Array of {id: string, text: string, completed: boolean}
+  items      Json?      // Array of {id: string, text: string, completed: boolean}
+  targetDate DateTime?  // Target completion date for short-term goals
 
   // For long-term goals (calendar)
   startDate  DateTime?

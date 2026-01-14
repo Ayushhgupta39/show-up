@@ -32,6 +32,7 @@ export function CreateGoalDialog({ groupId }: CreateGoalDialogProps) {
     title: "",
     description: "",
   })
+  const [targetDate, setTargetDate] = useState("")
   const [items, setItems] = useState<string[]>([""])
   const [dateRange, setDateRange] = useState({
     startDate: "",
@@ -59,6 +60,7 @@ export function CreateGoalDialog({ groupId }: CreateGoalDialogProps) {
                   text: item,
                   completed: false,
                 })),
+              ...(targetDate && { targetDate: new Date(targetDate).toISOString() }),
             }
           : {
               title: formData.title,
@@ -102,6 +104,7 @@ export function CreateGoalDialog({ groupId }: CreateGoalDialogProps) {
 
   const resetForm = () => {
     setFormData({ title: "", description: "" })
+    setTargetDate("")
     setItems([""])
     setDateRange({ startDate: "", endDate: "" })
     setMilestones([{ date: "", text: "" }])
@@ -180,6 +183,15 @@ export function CreateGoalDialog({ groupId }: CreateGoalDialogProps) {
                       setFormData({ ...formData, description: e.target.value })
                     }
                     rows={2}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="targetDate">Target Date (Optional)</Label>
+                  <Input
+                    id="targetDate"
+                    type="date"
+                    value={targetDate}
+                    onChange={(e) => setTargetDate(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">

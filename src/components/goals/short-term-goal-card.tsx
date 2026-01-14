@@ -7,7 +7,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { CheckCircle2, Trash2 } from "lucide-react"
+import { CheckCircle2, Calendar, Trash2 } from "lucide-react"
+import { format } from "date-fns"
 import { toast } from "sonner"
 
 interface ShortTermGoalCardProps {
@@ -17,6 +18,7 @@ interface ShortTermGoalCardProps {
     description?: string | null
     status: string
     items: any
+    targetDate?: Date | null
     user: {
       id: string
       name?: string | null
@@ -128,6 +130,12 @@ export function ShortTermGoalCard({ goal, currentUserId }: ShortTermGoalCardProp
             <p className="text-xs text-muted-foreground">
               By {goal.user.name || goal.user.email}
             </p>
+            {goal.targetDate && (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                <span>Target: {format(new Date(goal.targetDate), "MMM d, yyyy")}</span>
+              </div>
+            )}
           </div>
           {isOwner && (
             <Button

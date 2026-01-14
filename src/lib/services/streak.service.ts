@@ -1,5 +1,6 @@
 import prisma from "@/lib/db/prisma"
-import { isNextDay } from "@/lib/utils/date"
+import { isNextDay, getStartOfDayInTimezone } from "@/lib/utils/date"
+import { differenceInDays } from "date-fns"
 
 export async function updateStreakOnTaskCompletion(
   userId: string,
@@ -103,4 +104,63 @@ export async function getStreaksForGroup(groupId: string) {
       currentStreak: 'desc',
     },
   })
+}
+
+/**
+ * Check and reset stale streaks for a user.
+ * A streak is stale if the lastTaskDate is more than 1 day ago.
+ */
+export async function checkAndResetStaleStreaks(userId: string, timezone: string) {
+  const streaks = await prisma.streak.findMany({
+    where: {
+      userId,
+      currentStreak: { gt: 0 },
+    },
+  })
+
+  const today = getStartOfDayInTimezone(new Date(), timezone)
+
+  for (const streak of streaks) {
+    if (!streak.lastTaskDate) continue
+
+    const lastTaskDay = getStartOfDayInTimezone(streak.lastTaskDate, timezone)
+    const daysDiff = differenceInDays(today, lastTaskDay)
+
+    // If more than 1 day has passed since last task, reset the streak
+    if (daysDiff > 1) {
+      await prisma.streak.update({
+        where: { id: streak.id },
+        data: { currentStreak: 0 },
+      })
+    }
+  }
+}
+
+/**
+ * Check and reset stale streaks for all members of a group.
+ */
+export async function checkAndResetStaleStreaksForGroup(groupId: string, timezone: string) {
+  const streaks = await prisma.streak.findMany({
+    where: {
+      groupId,
+      currentStreak: { gt: 0 },
+    },
+  })
+
+  const today = getStartOfDayInTimezone(new Date(), timezone)
+
+  for (const streak of streaks) {
+    if (!streak.lastTaskDate) continue
+
+    const lastTaskDay = getStartOfDayInTimezone(streak.lastTaskDate, timezone)
+    const daysDiff = differenceInDays(today, lastTaskDay)
+
+    // If more than 1 day has passed since last task, reset the streak
+    if (daysDiff > 1) {
+      await prisma.streak.update({
+        where: { id: streak.id },
+        data: { currentStreak: 0 },
+      })
+    }
+  }
 }

@@ -7,7 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { getAllPendingTasksForUser } from "@/lib/services/task.service"
-import { getAllStreaksForUser } from "@/lib/services/streak.service"
+import { getAllStreaksForUser, checkAndResetStaleStreaks } from "@/lib/services/streak.service"
 import { getPendingTasksCount } from "@/lib/services/task.service"
 import { Flame, AlertCircle } from "lucide-react"
 
@@ -78,7 +78,8 @@ export default async function DashboardPage() {
     })
   }
 
-  // Get all streaks for user
+  // Check and reset stale streaks, then get all streaks for user
+  await checkAndResetStaleStreaks(session.user.id, session.user.timezone)
   const streaks = await getAllStreaksForUser(session.user.id)
   const streaksMap = new Map(streaks.map((s) => [s.groupId, s]))
 

@@ -105,7 +105,7 @@ export async function PATCH(
       )
     }
 
-    const { title, description, items, startDate, endDate, milestones, status } =
+    const { title, description, items, targetDate, startDate, endDate, milestones, status } =
       validatedFields.data
 
     const updatedGoal = await prisma.goal.update({
@@ -114,6 +114,7 @@ export async function PATCH(
         ...(title && { title }),
         ...(description !== undefined && { description }),
         ...(items && { items }),
+        ...(targetDate !== undefined && { targetDate: targetDate ? new Date(targetDate) : null }),
         ...(startDate && { startDate: new Date(startDate) }),
         ...(endDate && { endDate: new Date(endDate) }),
         ...(milestones && { milestones }),

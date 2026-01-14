@@ -10,6 +10,7 @@ export const createGoalSchema = z.object({
     text: z.string(),
     completed: z.boolean(),
   })).optional(),
+  targetDate: z.string().datetime().optional(),
   // For long-term goals
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
@@ -28,6 +29,7 @@ export const updateGoalSchema = z.object({
     text: z.string(),
     completed: z.boolean(),
   })).optional(),
+  targetDate: z.string().datetime().optional().nullable(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
   milestones: z.array(z.object({
