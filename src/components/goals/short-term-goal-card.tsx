@@ -7,8 +7,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { CheckCircle2, Calendar, Trash2 } from "lucide-react"
-import { format } from "date-fns"
+import { CheckCircle2, Calendar, Trash2, AlertTriangle } from "lucide-react"
+import { format, differenceInDays, isPast, isToday } from "date-fns"
 import { toast } from "sonner"
 
 interface ShortTermGoalCardProps {
@@ -39,6 +39,12 @@ export function ShortTermGoalCard({ goal, currentUserId }: ShortTermGoalCardProp
 
   const isOwner = goal.user.id === currentUserId
   const isCompleted = goal.status === "completed"
+
+  // Calculate target date status
+  const targetDate = goal.targetDate ? new Date(goal.targetDate) : null
+  const isOverdue = targetDate && !isCompleted && isPast(targetDate) && !isToday(targetDate)
+  const isDueToday = targetDate && !isCompleted && isToday(targetDate)
+  const daysRemaining = targetDate ? differenceInDays(targetDate, new Date()) : null
 
   const handleToggleItem = async (itemId: string) => {
     setIsLoading(true)
@@ -106,11 +112,20 @@ export function ShortTermGoalCard({ goal, currentUserId }: ShortTermGoalCardProp
   }
 
   return (
-    <Card>
+    <Card className={
+      isOverdue
+        ? "border-red-300 dark:border-red-800"
+        : isDueToday
+          ? "border-orange-300 dark:border-orange-800"
+          : ""
+    }>
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="text-xs font-normal">
+                Short-term
+              </Badge>
               <CardTitle className="text-lg">{goal.title}</CardTitle>
               {isCompleted && (
                 <Badge variant="default" className="bg-green-500">
@@ -130,10 +145,37 @@ export function ShortTermGoalCard({ goal, currentUserId }: ShortTermGoalCardProp
             <p className="text-xs text-muted-foreground">
               By {goal.user.name || goal.user.email}
             </p>
-            {goal.targetDate && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Calendar className="h-3 w-3" />
-                <span>Target: {format(new Date(goal.targetDate), "MMM d, yyyy")}</span>
+            {targetDate && (
+              <div className={`flex items-center gap-2 text-xs mt-1 ${
+                isOverdue
+                  ? "text-red-600 dark:text-red-400"
+                  : isDueToday
+                    ? "text-orange-600 dark:text-orange-400"
+                    : "text-muted-foreground"
+              }`}>
+                {isOverdue ? (
+                  <AlertTriangle className="h-3 w-3" />
+                ) : (
+                  <Calendar className="h-3 w-3" />
+                )}
+                <span className="font-medium">
+                  {format(targetDate, "MMM d, yyyy")}
+                </span>
+                {!isCompleted && (
+                  <Badge
+                    variant={isOverdue ? "destructive" : isDueToday ? "default" : "outline"}
+                    className={`text-xs px-1.5 py-0 h-5 ${
+                      isDueToday ? "bg-orange-500" : ""
+                    }`}
+                  >
+                    {isOverdue
+                      ? `${Math.abs(daysRemaining!)} days overdue`
+                      : isDueToday
+                        ? "Due today"
+                        : `${daysRemaining} days left`
+                    }
+                  </Badge>
+                )}
               </div>
             )}
           </div>

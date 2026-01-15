@@ -70,7 +70,7 @@ function LoginForm() {
                 required
               />
             </div>
-            <div className="space-y-2 mb-2">
+            <div className="space-y-2 mb-4">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"

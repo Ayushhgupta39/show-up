@@ -15,7 +15,15 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Plus } from "lucide-react"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Plus, CalendarIcon } from "lucide-react"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
 interface CreateTaskDialogProps {
@@ -26,27 +34,22 @@ export function CreateTaskDialog({ groupId }: CreateTaskDialogProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    date: new Date().toISOString().split("T")[0],
-  })
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
+  const [date, setDate] = useState<Date>(new Date())
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      // Convert date to ISO string
-      const dateObj = new Date(formData.date)
-      const isoDate = dateObj.toISOString()
-
       const response = await fetch(`/api/groups/${groupId}/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
-          date: isoDate,
+          title,
+          description,
+          date: date.toISOString(),
         }),
       })
 
@@ -59,11 +62,9 @@ export function CreateTaskDialog({ groupId }: CreateTaskDialogProps) {
 
       toast.success("Task created successfully!")
       setOpen(false)
-      setFormData({
-        title: "",
-        description: "",
-        date: new Date().toISOString().split("T")[0],
-      })
+      setTitle("")
+      setDescription("")
+      setDate(new Date())
       router.refresh()
     } catch (error) {
       toast.error("Something went wrong. Please try again.")
@@ -95,10 +96,8 @@ export function CreateTaskDialog({ groupId }: CreateTaskDialogProps) {
               <Input
                 id="title"
                 placeholder="e.g., Write 500 words"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 required
               />
             </div>
@@ -107,24 +106,35 @@ export function CreateTaskDialog({ groupId }: CreateTaskDialogProps) {
               <Textarea
                 id="description"
                 placeholder="Add details about your task..."
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 rows={3}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="date">Date</Label>
-              <Input
-                id="date"
-                type="date"
-                value={formData.date}
-                onChange={(e) =>
-                  setFormData({ ...formData, date: e.target.value })
-                }
-                required
-              />
+              <Label>Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(d) => d && setDate(d)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <DialogFooter>

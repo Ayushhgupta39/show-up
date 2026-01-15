@@ -16,7 +16,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Target, Plus, X } from "lucide-react"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Target, Plus, X, CalendarIcon } from "lucide-react"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
 interface CreateGoalDialogProps {
@@ -32,14 +40,17 @@ export function CreateGoalDialog({ groupId }: CreateGoalDialogProps) {
     title: "",
     description: "",
   })
-  const [targetDate, setTargetDate] = useState("")
+  const [targetDate, setTargetDate] = useState<Date | undefined>(undefined)
   const [items, setItems] = useState<string[]>([""])
-  const [dateRange, setDateRange] = useState({
-    startDate: "",
-    endDate: "",
+  const [dateRange, setDateRange] = useState<{
+    startDate: Date | undefined
+    endDate: Date | undefined
+  }>({
+    startDate: undefined,
+    endDate: undefined,
   })
-  const [milestones, setMilestones] = useState<{ date: string; text: string }[]>([
-    { date: "", text: "" },
+  const [milestones, setMilestones] = useState<{ date: Date | undefined; text: string }[]>([
+    { date: undefined, text: "" },
   ])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,18 +71,18 @@ export function CreateGoalDialog({ groupId }: CreateGoalDialogProps) {
                   text: item,
                   completed: false,
                 })),
-              ...(targetDate && { targetDate: new Date(targetDate).toISOString() }),
+              ...(targetDate && { targetDate: targetDate.toISOString() }),
             }
           : {
               title: formData.title,
               description: formData.description,
               type: "long_term",
-              startDate: new Date(dateRange.startDate).toISOString(),
-              endDate: new Date(dateRange.endDate).toISOString(),
+              startDate: dateRange.startDate?.toISOString(),
+              endDate: dateRange.endDate?.toISOString(),
               milestones: milestones
                 .filter((m) => m.date && m.text.trim())
                 .map((m) => ({
-                  date: new Date(m.date).toISOString(),
+                  date: m.date!.toISOString(),
                   text: m.text,
                   completed: false,
                 })),
@@ -104,10 +115,10 @@ export function CreateGoalDialog({ groupId }: CreateGoalDialogProps) {
 
   const resetForm = () => {
     setFormData({ title: "", description: "" })
-    setTargetDate("")
+    setTargetDate(undefined)
     setItems([""])
-    setDateRange({ startDate: "", endDate: "" })
-    setMilestones([{ date: "", text: "" }])
+    setDateRange({ startDate: undefined, endDate: undefined })
+    setMilestones([{ date: undefined, text: "" }])
   }
 
   const addItem = () => {
@@ -125,16 +136,22 @@ export function CreateGoalDialog({ groupId }: CreateGoalDialogProps) {
   }
 
   const addMilestone = () => {
-    setMilestones([...milestones, { date: "", text: "" }])
+    setMilestones([...milestones, { date: undefined, text: "" }])
   }
 
   const removeMilestone = (index: number) => {
     setMilestones(milestones.filter((_, i) => i !== index))
   }
 
-  const updateMilestone = (index: number, field: "date" | "text", value: string) => {
+  const updateMilestoneDate = (index: number, date: Date | undefined) => {
     const newMilestones = [...milestones]
-    newMilestones[index][field] = value
+    newMilestones[index].date = date
+    setMilestones(newMilestones)
+  }
+
+  const updateMilestoneText = (index: number, text: string) => {
+    const newMilestones = [...milestones]
+    newMilestones[index].text = text
     setMilestones(newMilestones)
   }
 
@@ -186,13 +203,29 @@ export function CreateGoalDialog({ groupId }: CreateGoalDialogProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="targetDate">Target Date (Optional)</Label>
-                  <Input
-                    id="targetDate"
-                    type="date"
-                    value={targetDate}
-                    onChange={(e) => setTargetDate(e.target.value)}
-                  />
+                  <Label>Target Date (Optional)</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !targetDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {targetDate ? format(targetDate, "PPP") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={targetDate}
+                        onSelect={setTargetDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div className="space-y-2">
                   <Label>Checklist Items</Label>
@@ -254,49 +287,87 @@ export function CreateGoalDialog({ groupId }: CreateGoalDialogProps) {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="startDate">Start Date</Label>
-                    <Input
-                      id="startDate"
-                      type="date"
-                      value={dateRange.startDate}
-                      onChange={(e) =>
-                        setDateRange({ ...dateRange, startDate: e.target.value })
-                      }
-                      required
-                    />
+                    <Label>Start Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !dateRange.startDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {dateRange.startDate ? format(dateRange.startDate, "PPP") : "Pick a date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={dateRange.startDate}
+                          onSelect={(date) => setDateRange({ ...dateRange, startDate: date })}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="endDate">End Date</Label>
-                    <Input
-                      id="endDate"
-                      type="date"
-                      value={dateRange.endDate}
-                      onChange={(e) =>
-                        setDateRange({ ...dateRange, endDate: e.target.value })
-                      }
-                      required
-                    />
+                    <Label>End Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !dateRange.endDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {dateRange.endDate ? format(dateRange.endDate, "PPP") : "Pick a date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={dateRange.endDate}
+                          onSelect={(date) => setDateRange({ ...dateRange, endDate: date })}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Milestones</Label>
                   {milestones.map((milestone, index) => (
                     <div key={index} className="flex gap-2">
-                      <Input
-                        type="date"
-                        value={milestone.date}
-                        onChange={(e) =>
-                          updateMilestone(index, "date", e.target.value)
-                        }
-                        required
-                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-[140px] justify-start text-left font-normal",
+                              !milestone.date && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {milestone.date ? format(milestone.date, "MMM d") : "Date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={milestone.date}
+                            onSelect={(date) => updateMilestoneDate(index, date)}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                       <Input
                         placeholder="Milestone description"
                         value={milestone.text}
-                        onChange={(e) =>
-                          updateMilestone(index, "text", e.target.value)
-                        }
-                        required
+                        onChange={(e) => updateMilestoneText(index, e.target.value)}
+                        className="flex-1"
                       />
                       {milestones.length > 1 && (
                         <Button

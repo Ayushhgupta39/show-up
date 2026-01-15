@@ -31,15 +31,25 @@ export default async function GroupPage({
 
   const { groupId } = await params;
 
+  // Validate ObjectId format (MongoDB ObjectIds are 24 hex characters)
+  if (!/^[a-fA-F0-9]{24}$/.test(groupId)) {
+    notFound();
+  }
+
   // Check if user is a member
-  const membership = await prisma.groupMember.findUnique({
-    where: {
-      groupId_userId: {
-        groupId,
-        userId: session.user.id,
+  let membership;
+  try {
+    membership = await prisma.groupMember.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId: session.user.id,
+        },
       },
-    },
-  });
+    });
+  } catch {
+    notFound();
+  }
 
   if (!membership) {
     notFound();
@@ -241,6 +251,9 @@ export default async function GroupPage({
                       goal={{
                         ...goal,
                         items: goal.items || [],
+                        targetDate: goal.targetDate
+                          ? new Date(goal.targetDate)
+                          : null,
                       }}
                       currentUserId={session.user.id}
                     />

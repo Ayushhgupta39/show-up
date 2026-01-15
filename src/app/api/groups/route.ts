@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth/auth"
 import prisma from "@/lib/db/prisma"
 import { createGroupSchema } from "@/lib/validations/group"
+import { randomBytes } from "crypto"
+
+function generateInviteToken(): string {
+  return randomBytes(16).toString("hex")
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -71,12 +76,13 @@ export async function POST(req: NextRequest) {
 
     const { name, description } = validatedFields.data
 
-    // Create group
+    // Create group with unique invite token
     const group = await prisma.group.create({
       data: {
         name,
         description,
         ownerId: session.user.id,
+        inviteToken: generateInviteToken(),
         members: {
           create: {
             userId: session.user.id,

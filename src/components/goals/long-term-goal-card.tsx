@@ -112,7 +112,10 @@ export function LongTermGoalCard({ goal, currentUserId }: LongTermGoalCardProps)
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="text-xs font-normal">
+                Long-term
+              </Badge>
               <CardTitle className="text-lg">{goal.title}</CardTitle>
               {isCompleted && (
                 <Badge variant="default" className="bg-green-500">

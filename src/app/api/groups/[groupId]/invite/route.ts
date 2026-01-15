@@ -85,10 +85,12 @@ export async function DELETE(
       )
     }
 
-    // Remove invite token
+    // Generate a new token to invalidate the old one
+    // (Setting to null would violate unique constraint if another group has null)
+    const newToken = randomBytes(16).toString("hex")
     await prisma.group.update({
       where: { id: groupId },
-      data: { inviteToken: null },
+      data: { inviteToken: newToken },
     })
 
     return NextResponse.json({ message: "Invite link revoked" })
